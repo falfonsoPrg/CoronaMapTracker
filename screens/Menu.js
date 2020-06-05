@@ -10,6 +10,7 @@ import colors from "../constants/colors";
 import Card from "../components/Card";
 
 export default function Menu({ route, navigation }) {
+  //<View style={styles.button}><Button title="View Profile" onPress={() => { navigation.navigate("Profile") }} color={colors.accent} /></View>
     return (
         <View style={styles.screen}>
             <Text style={styles.title}>Corona Map Tracker</Text>
@@ -18,7 +19,6 @@ export default function Menu({ route, navigation }) {
                 <View style={styles.button}><Button title="Register QR" onPress={() => {navigation.navigate("Scan QR")}} color={colors.accent} /></View>
                 <View style={styles.button}><Button title="Register Symptoms" onPress={() => { navigation.navigate("Symptoms") }} color={colors.accent} /></View>
                 <View style={styles.button}><Button title="Register Place" onPress={() => { navigation.navigate("Place") }} color={colors.accent} /></View>
-                <View style={styles.button}><Button title="View Profile" onPress={() => { navigation.navigate("Profile") }} color={colors.accent} /></View>
                 <View ><Button title="Log out" onPress={ async () => {
                       try {
                         await AsyncStorage.removeItem("Token");

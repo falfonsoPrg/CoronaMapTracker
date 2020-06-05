@@ -10,6 +10,7 @@ import colors from "../constants/colors";
 import Card from "../components/Card";
 import Input from "../components/Input";
 import Spinner from 'react-native-loading-spinner-overlay';
+import * as Location from 'expo-location';
 
 const axios = require('axios');
 
@@ -48,6 +49,13 @@ export default function Place({ route, navigation }) {
     }
 
     useEffect(() => {
+      (async () => {
+        let { status } = await Location.requestPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+        }
+      })();
+
         async function fetchPlace(){
 
             handlespinner(true)
@@ -101,29 +109,30 @@ export default function Place({ route, navigation }) {
                         try {
                         handlespinner(true)
                         var token = await AsyncStorage.getItem('Token');
+                        let location = await Location.getCurrentPositionAsync({});
+                        console.log(location.coords.altitude)
                         axios({
-                            url: 'https://coronamaptrackerbackend.herokuapp.com/user/registerPlace',
-                            method: 'post',
-                            data: {
-                                cod_place: 0,
-                                place_name: namePlace,
-                                latitude_place: 77.7,
-                                longitude_place: -77.7
-                            },
-                            headers: {
-                              "auth-token": token,
-                              'Content-Type': 'application/json',
+                          url: 'https://coronamaptrackerbackend.herokuapp.com/user/registerPlace',
+                          method: 'post',
+                          data: {
+                              cod_place: 0,
+                              place_name: namePlace,
+                              latitude_place: location.coords.latitude,
+                              longitude_place: location.coords.longitude
+                          },
+                          headers: {
+                            "auth-token": token,
+                            'Content-Type': 'application/json',
+                          }
+                        }).then(function (response) {
+                          handlespinner(false)
+                          refreshPlaces(token)
+                        }).catch(function (error) {
+                          handlespinner(false)
+                          if(error.response){
+                              alert("An error occurred: " + error.response.data)
                             }
-                          }).then(function (response) {
-                            handlespinner(false)
-                            refreshPlaces(token)
-                          }).catch(function (error) {
-                            handlespinner(false)
-                            if(error.response){
-                                alert("An error occurred: " + error.response.data)
-                              }
-                          });
-
+                        });
                           } catch (error) {
                               console.log(error)
                           }
